@@ -22,9 +22,11 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/codegangsta/negroni"
 	"github.com/containous/oxy/cbreaker"
+	"github.com/containous/oxy/connlimit"
 	"github.com/containous/oxy/forward"
 	"github.com/containous/oxy/roundrobin"
 	"github.com/containous/oxy/stream"
+	"github.com/containous/oxy/utils"
 	"github.com/containous/traefik/middlewares"
 	"github.com/containous/traefik/provider"
 	"github.com/containous/traefik/safe"
@@ -393,6 +395,17 @@ func (server *Server) loadConfig(configurations configs, globalConfiguration Glo
 						lbMethod, err := types.NewLoadBalancerMethod(configuration.Backends[frontend.Backend].LoadBalancer)
 						if err != nil {
 							configuration.Backends[frontend.Backend].LoadBalancer = &types.LoadBalancer{Method: "wrr"}
+						}
+						maxConns := configuration.Backends[frontend.Backend].MaxConn
+						if maxConns != nil && maxConns.Amount != 0 {
+							extractFunc, err := utils.NewExtractor(maxConns.ExtractorFunc)
+							if err != nil {
+								return nil, err
+							}
+							lb, err = connlimit.New(fwd, extractFunc, maxConns.Amount, connlimit.Logger(oxyLogger))
+							if err != nil {
+								return nil, err
+							}
 						}
 						switch lbMethod {
 						case types.Drr:
