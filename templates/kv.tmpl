@@ -18,7 +18,7 @@
 {{end}}
 
 {{$maxConnAmt := Get "" . "/maxconn/" "amount"}}
-{{$maxConnExtractorFunc := Get "" . "/maxconn/" "extractorFunc"}}
+{{$maxConnExtractorFunc := Get "" . "/maxconn/" "extractorfunc"}}
 {{with $maxConnAmt}}
 {{with $maxConnExtractorFunc}}
 [backends.{{Last $backend}}.maxConn]
