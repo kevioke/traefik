@@ -22,7 +22,7 @@
 {{with $maxConnAmt}}
 {{with $maxConnExtractorFunc}}
 [backends.{{Last $backend}}.maxConn]
-    amount = "{{$maxConnAmt}}"
+    amount = {{$maxConnAmt}}
     extractorFunc = "{{$maxConnExtractorFunc}}"
 {{end}}
 {{end}}
